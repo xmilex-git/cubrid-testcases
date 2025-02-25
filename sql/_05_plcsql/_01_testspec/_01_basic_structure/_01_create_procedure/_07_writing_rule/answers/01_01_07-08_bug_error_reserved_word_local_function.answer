@@ -565,7 +565,9 @@ REVERSE
 
 
 ===================================================
-0
+Error:-1360
+In line 2, column 10
+Stored procedure compile error: mismatched input 'REVERSE'
 
 ===================================================
 'ROLLBACK'    
@@ -868,5 +870,6 @@ In line 6, column 1
 Stored procedure compile error: mismatched input 'begin'
 
 ===================================================
-0
+Error:-894
+Stored procedure/function 'dba.p_local' does not exist.
 
