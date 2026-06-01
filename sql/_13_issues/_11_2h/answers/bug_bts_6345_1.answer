@@ -171,28 +171,27 @@ count(*)
 632     
 
 Query plan:
-iscan
-    class: z node[?]
-    index: i_foo_i_j term[?] AND term[?] (covers)
-    sargs: term[?]
-    cost:  ? card ?
-Query stmt:
-(select y.k from foo z where z.i=x.i+? and (z.j=y.j+?) and inst_num()<= ?:? )
-Query plan:
-idx-join (inner join)
-    outer: sscan
-               class: x node[?]
+nl-join (inner join)
+    edge:  table(? ?) -> z node[?]
+    outer: idx-join (inner join)
+               outer: sscan
+                          class: x node[?]
+                          cost:  ? card ?
+               inner: iscan
+                          class: y node[?]
+                          index: i_foo_i_j term[?]
+                          sargs: x node[?] <dj> y node[?]
+                          cost:  ? card ?
+               sargs: x node[?] <dj> y node[?]
                cost:  ? card ?
-    inner: iscan
-               class: y node[?]
-               index: i_foo_i_j term[?]
-               sargs: term[?]
+    inner: sscan
+               class: z node[?]
+               sargs: table(? ?) -> z node[?] AND term[?] AND term[?]
                cost:  ? card ?
-    sargs: term[?]
-    subqs: ?
+    sargs: term[?] AND term[?]
     cost:  ? card ?
-Query stmt:
-select /*+ ORDERED USE_IDX */ count(*) from foo x, foo y where x.i=y.i and  exists (select y.k from foo z where z.i=x.i+? and (z.j=y.j+?) and inst_num()<= ?:? )
+Query stmt: [Warning: HINT ignored]
+select count(*) from foo x, foo y, foo z where x.i=y.i and z.i=x.i+? and z.j=y.j+?
 ===================================================
 0
 ===================================================

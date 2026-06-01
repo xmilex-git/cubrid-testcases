@@ -456,23 +456,20 @@ id    text
 7     ACABC     
 
 Query plan:
-temp(distinct)
-    subplan: iscan
-                 class: t? node[?]
-                 index: idx_tbl? term[?] (covers)
-                 cost:  ? card ?
+nl-join (inner join)
+    edge:  table(?) -> t? node[?]
+    outer: iscan
+               class: t? node[?]
+               index: idx_tbl? term[?] (covers)
+               cost:  ? card ?
+    inner: sscan
+               class: t? node[?]
+               sargs: table(?) -> t? node[?] AND term[?] AND term[?]
+               cost:  ? card ?
+    sargs: term[?] AND term[?]
     cost:  ? card ?
 Query stmt:
-(select distinct t?.id from tbl? t? where t?.id=t?.id)
-Query plan:
-iscan
-    class: t? node[?]
-    index: idx_tbl? term[?] (covers)
-    sargs: term[?]
-    subqs: ?
-    cost:  ? card ?
-Query stmt:
-select t?.id, t?.[text] from tbl t? where t?.id in (select distinct t?.id from tbl? t? where t?.id=t?.id) and (t?.id> ?:? )
+select t?.id, t?.[text] from tbl t?, tbl? t? where (t?.id> ?:? ) and t?.id=t?.id and t?.id=t?.id
 ===================================================
 0
 ===================================================

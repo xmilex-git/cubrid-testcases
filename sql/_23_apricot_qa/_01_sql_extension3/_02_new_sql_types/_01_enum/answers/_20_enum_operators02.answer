@@ -476,24 +476,23 @@ id    col5    col1
 3     2010-08-20 07:20:34     999999999.999999999     
 
 Query plan:
-sscan
-    class: t? node[?]
-    sargs: term[?] AND term[?]
-    cost:  ? card ?
-Query stmt:
-(select t?.id from oper? t? where (t?.col?= cast(t?.col? as timestamp)) and inst_num()<= ?:? )
-Query plan:
 temp(order by)
-    subplan: iscan
-                 class: t? node[?]
-                 index: u_oper?_id term[?]
+    subplan: nl-join (inner join)
+                 edge:  table(?) -> t? node[?]
+                 outer: iscan
+                            class: t? node[?]
+                            index: u_oper?_id term[?]
+                            cost:  ? card ?
+                 inner: sscan
+                            class: t? node[?]
+                            sargs: table(?) -> t? node[?] AND term[?]
+                            cost:  ? card ?
                  sargs: term[?]
-                 subqs: ?
                  cost:  ? card ?
     sort:  ? asc, ? asc, ? asc
     cost:  ? card ?
 Query stmt:
-select /*+ ORDERED */ t?.id, t?.col?, t?.col? from oper? t? where  exists (select t?.id from oper? t? where (t?.col?= cast(t?.col? as timestamp)) and inst_num()<= ?:? ) and (t?.id< ?:? ) order by ?, ?, ?
+select /*+ ORDERED */ t?.id, t?.col?, t?.col? from oper? t?, oper? t? where (t?.id< ?:? ) and t?.col?= cast(t?.col? as timestamp) order by ?, ?, ?
 ===================================================
 id    col5    col1    
 

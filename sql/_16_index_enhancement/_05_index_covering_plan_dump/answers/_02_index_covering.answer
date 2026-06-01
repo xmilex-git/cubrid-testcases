@@ -233,22 +233,22 @@ id
 1     
 
 Query plan:
-temp(distinct)
-    subplan: iscan
-                 class: t? node[?]
-                 index: idx_tbl? term[?] (covers)
-                 cost:  ? card ?
+nl-join (inner join)
+    edge:  table(?) -> t? node[?]
+    outer: iscan
+               class: t? node[?]
+               index: idx_tbl? term[?] (covers)
+               cost:  ? card ?
+    inner: iscan
+               class: t? node[?]
+               index: idx_tbl? term[?] (covers)
+               filtr: table(?) -> t? node[?]
+               sargs: term[?] AND term[?]
+               cost:  ? card ?
+    sargs: term[?] AND term[?]
     cost:  ? card ?
 Query stmt:
-(select distinct t?.id from tbl? t? where t?.id= ?:? )
-Query plan:
-iscan
-    class: t? node[?]
-    index: idx_tbl? term[?] (covers)
-    sargs: term[?]
-    cost:  ? card ?
-Query stmt:
-select t?.id from tbl t? where ? in (select distinct t?.id from tbl? t? where t?.id= ?:? ) and t?.id= ?:? 
+select t?.id from tbl t?, tbl? t? where t?.id= ?:?  and t?.id= ?:?  and t?.id=t?.id and t?.id=t?.id
 ===================================================
 0
 ===================================================

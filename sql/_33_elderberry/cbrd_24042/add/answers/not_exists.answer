@@ -26,20 +26,20 @@ id    name
 2     Moy     
 
 Query plan:
-sscan
-    class: tb node[?]
-    sargs: term[?] AND term[?]
+nl-join (inner join)
+    edge:  table(?) -> tb node[?]
+    outer: sscan
+               class: v node[?]
+               sargs: term[?]
+               cost:  ? card ?
+    inner: sscan
+               class: tb node[?]
+               sargs: table(?) -> tb node[?] AND term[?]
+               cost:  ? card ?
+    sargs: term[?]
     cost:  ? card ?
 Query stmt:
-(select ? from tbl tb where (tb.ID=v.MgrID) and inst_num()<= ?:? )
-Query plan:
-sscan
-    class: v node[?]
-    sargs: term[?] AND term[?]
-    subqs: ?
-    cost:  ? card ?
-Query stmt:
-select v.ID, v.[Name] from tbl v where (v.ID< ?:? ) and ( not  exists (select ? from tbl tb where (tb.ID=v.MgrID) and inst_num()<= ?:? ))
+select v.ID, v.[Name] from tbl v, tbl tb where (v.ID< ?:? ) and v.MgrID=tb.ID
 ===================================================
 0
 ===================================================
@@ -48,19 +48,19 @@ ID    Name
 2     Moy     
 
 Query plan:
-sscan
-    class: tb node[?]
-    sargs: term[?] AND term[?]
+nl-join (inner join)
+    edge:  table(?) -> tb node[?]
+    outer: sscan
+               class: v node[?]
+               sargs: term[?]
+               cost:  ? card ?
+    inner: sscan
+               class: tb node[?]
+               sargs: table(?) -> tb node[?] AND term[?]
+               cost:  ? card ?
+    sargs: term[?]
     cost:  ? card ?
 Query stmt:
-(select ? from tbl tb where (tb.ID=v.MgrID) and inst_num()<= ?:? )
-Query plan:
-sscan
-    class: v node[?]
-    sargs: term[?] AND term[?]
-    subqs: ?
-    cost:  ? card ?
-Query stmt:
-select v.ID, v.[Name] from tbl v where (v.ID< ?:? ) and ( not  exists (select ? from tbl tb where (tb.ID=v.MgrID) and inst_num()<= ?:? ))
+select v.ID, v.[Name] from tbl v, tbl tb where (v.ID< ?:? ) and v.MgrID=tb.ID
 ===================================================
 0
