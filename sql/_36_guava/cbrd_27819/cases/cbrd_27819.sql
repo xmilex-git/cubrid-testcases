@@ -70,11 +70,11 @@ update statistics on t_big, t_num, t_wide, t_flt, t_rng, t_lst, t_hsh, t_flat, t
 
 evaluate 'Case 1: BIGINT index, equality and ranges near 2^53 and 2^57';
 --@queryplan
-select /*+ recompile */ 'c1ai' q, b from t_big force index (i_big_b) where b = 9007199254740992e0 order by b + 0;
-select /*+ recompile */ 'c1an' q, b from t_big where b = 9007199254740992e0 using index none order by b + 0;
+select /*+ recompile */ 'c1ai' q, b from t_big force index (i_big_b) where b = 9007199254740992e0 order by b;
+select /*+ recompile */ 'c1an' q, b from t_big where b = 9007199254740992e0 using index none order by b;
 --@queryplan
-select /*+ recompile */ 'c1bi' q, b from t_big force index (i_big_b) where b = 9007199254740994e0 order by b + 0;
-select /*+ recompile */ 'c1bn' q, b from t_big where b = 9007199254740994e0 using index none order by b + 0;
+select /*+ recompile */ 'c1bi' q, b from t_big force index (i_big_b) where b = 9007199254740994e0 order by b;
+select /*+ recompile */ 'c1bn' q, b from t_big where b = 9007199254740994e0 using index none order by b;
 --@queryplan
 select /*+ recompile */ 'c1ci' q, b from t_big force index (i_big_b) where b > 9007199254740992e0 and b < 9007199254741000 order by b;
 select /*+ recompile */ 'c1cn' q, b from t_big where b > 9007199254740992e0 and b < 9007199254741000 using index none order by b;
@@ -85,8 +85,8 @@ select /*+ recompile */ 'c1dn' q, b from t_big where b >= 9007199254740992e0 and
 select /*+ recompile */ 'c1ei' q, b from t_big force index (i_big_b) where b < 9007199254740992e0 and b > 3 order by b;
 select /*+ recompile */ 'c1en' q, b from t_big where b < 9007199254740992e0 and b > 3 using index none order by b;
 --@queryplan
-select /*+ recompile */ 'c1fi' q, b from t_big force index (i_big_b) where b = 144115188075855872e0 order by b + 0;
-select /*+ recompile */ 'c1fn' q, b from t_big where b = 144115188075855872e0 using index none order by b + 0;
+select /*+ recompile */ 'c1fi' q, b from t_big force index (i_big_b) where b = 144115188075855872e0 order by b;
+select /*+ recompile */ 'c1fn' q, b from t_big where b = 144115188075855872e0 using index none order by b;
 --@queryplan
 select /*+ recompile */ 'c1gi' q, b from t_big force index (i_big_b) where b in (9007199254740992e0, 144115188075855872e0) order by b;
 select /*+ recompile */ 'c1gn' q, b from t_big where b in (9007199254740992e0, 144115188075855872e0) using index none order by b;

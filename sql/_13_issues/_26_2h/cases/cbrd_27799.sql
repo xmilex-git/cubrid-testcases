@@ -13,8 +13,7 @@
  *  Each query runs on the index (USING INDEX, plan printed) and on the heap
  *  (USING INDEX NONE). Label q ends in i for the index and n for the heap.
  *  The expected rows of both are the rows of the heap scan.
- *  Case 3 repeats the shape with host variables. ORDER BY uses b + 0 because the
- *  equality on b removes b itself from the sort keys.
+ *  Case 3 repeats the shape with host variables.
  *
  *  Coverage:
  *    Case 1:  the issue repro with c >= 5
@@ -33,21 +32,21 @@ update statistics on t_gbc with fullscan;
 
 evaluate 'Case 1: the issue repro with c >= 5';
 --@queryplan
-select /*+ recompile */ 'c1an' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c >= 5 using index none order by b + 0, c;
+select /*+ recompile */ 'c1an' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c >= 5 using index none order by b, c;
 --@queryplan
-select /*+ recompile */ 'c1ai' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c >= 5 using index i_gbc order by b + 0, c;
+select /*+ recompile */ 'c1ai' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c >= 5 using index i_gbc order by b, c;
 
 
 evaluate 'Case 2: the issue repro with c = 5';
 --@queryplan
-select /*+ recompile */ 'c2an' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c = 5 using index none order by b + 0, c;
+select /*+ recompile */ 'c2an' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c = 5 using index none order by b, c;
 --@queryplan
-select /*+ recompile */ 'c2ai' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c = 5 using index i_gbc order by b + 0, c;
+select /*+ recompile */ 'c2ai' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c = 5 using index i_gbc order by b, c;
 
 
 evaluate 'Case 3: DOUBLE and BIGINT host variables for b';
-prepare st_none from 'select /*+ recompile */ ? q, b, c from t_gbc where g = 3 and b = ? and c >= ? using index none order by b + 0, c';
-prepare st_idx from 'select /*+ recompile */ ? q, b, c from t_gbc where g = 3 and b = ? and c >= ? using index i_gbc order by b + 0, c';
+prepare st_none from 'select /*+ recompile */ ? q, b, c from t_gbc where g = 3 and b = ? and c >= ? using index none order by b, c';
+prepare st_idx from 'select /*+ recompile */ ? q, b, c from t_gbc where g = 3 and b = ? and c >= ? using index i_gbc order by b, c';
 execute st_none using 'c3an', 9007199254740992.0e0, 5;
 execute st_idx using 'c3ai', 9007199254740992.0e0, 5;
 execute st_none using 'c3bn', 9007199254740993, 1;
