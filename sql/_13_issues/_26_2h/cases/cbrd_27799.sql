@@ -3,20 +3,23 @@
  *  BIGINT column is searched by a DOUBLE value returns the rows a sequential scan
  *  returns when a later column has a range or equality condition.
  *
- *  Before the fix the sequential scan compared in DOUBLE and took the rows of both
- *  b = 2^53 and b = 2^53+1, while the index scan returned other rows, one of them
- *  failing the condition on c.
- *  With CBRD-27819 the DOUBLE 9007199254740993.0e0 is 2^53 and equals only b = 2^53,
- *  so both scans return the rows of b = 2^53.
+ *  A BIGINT compared with a DOUBLE is compared in DOUBLE. The DOUBLE literal
+ *  9007199254740993.0e0 is 2^53, so b = 9007199254740993.0e0 is true for both
+ *  b = 2^53 and b = 2^53+1.
+ *  Before the fix the sequential scan returned the rows of both b values, while the
+ *  index scan searched one key and applied the condition on c to other rows, so it
+ *  returned a row that fails c >= 5 and missed rows that pass it.
  *
  *  Each query runs on the index (USING INDEX, plan printed) and on the heap
- *  (USING INDEX NONE). The two result blocks must be equal and equal to the
- *  expected rows. Case 3 repeats the shape with a DOUBLE host variable.
+ *  (USING INDEX NONE). Label q ends in i for the index and n for the heap.
+ *  The expected rows of both are the rows of the heap scan.
+ *  Case 3 repeats the shape with host variables. ORDER BY uses b + 0 because the
+ *  equality on b removes b itself from the sort keys.
  *
  *  Coverage:
  *    Case 1:  the issue repro with c >= 5
  *    Case 2:  the issue repro with c = 5
- *    Case 3:  DOUBLE host variable for b
+ *    Case 3:  DOUBLE and BIGINT host variables for b
  */
 
 drop table if exists t_gbc;
@@ -30,25 +33,25 @@ update statistics on t_gbc with fullscan;
 
 evaluate 'Case 1: the issue repro with c >= 5';
 --@queryplan
-select /*+ recompile */ 'c1n' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c >= 5 using index none order by 2, 3;
+select /*+ recompile */ 'c1an' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c >= 5 using index none order by b + 0, c;
 --@queryplan
-select /*+ recompile */ 'c1i' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c >= 5 using index i_gbc order by 2, 3;
+select /*+ recompile */ 'c1ai' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c >= 5 using index i_gbc order by b + 0, c;
 
 
 evaluate 'Case 2: the issue repro with c = 5';
 --@queryplan
-select /*+ recompile */ 'c2n' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c = 5 using index none order by 2, 3;
+select /*+ recompile */ 'c2an' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c = 5 using index none order by b + 0, c;
 --@queryplan
-select /*+ recompile */ 'c2i' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c = 5 using index i_gbc order by 2, 3;
+select /*+ recompile */ 'c2ai' q, b, c from t_gbc where g = 3 and b = 9007199254740993.0e0 and c = 5 using index i_gbc order by b + 0, c;
 
 
-evaluate 'Case 3: DOUBLE host variable for b';
-prepare st_none from 'select /*+ recompile */ ''c3n'' q, ? o, b, c from t_gbc where g = 3 and b = ? and c >= ? using index none order by 3, 4';
-prepare st_idx from 'select /*+ recompile */ ''c3i'' q, ? o, b, c from t_gbc where g = 3 and b = ? and c >= ? using index i_gbc order by 3, 4';
-execute st_none using 'double', 9007199254740992.0e0, 5;
-execute st_idx using 'double', 9007199254740992.0e0, 5;
-execute st_none using 'bigint', 9007199254740993, 1;
-execute st_idx using 'bigint', 9007199254740993, 1;
+evaluate 'Case 3: DOUBLE and BIGINT host variables for b';
+prepare st_none from 'select /*+ recompile */ ? q, b, c from t_gbc where g = 3 and b = ? and c >= ? using index none order by b + 0, c';
+prepare st_idx from 'select /*+ recompile */ ? q, b, c from t_gbc where g = 3 and b = ? and c >= ? using index i_gbc order by b + 0, c';
+execute st_none using 'c3an', 9007199254740992.0e0, 5;
+execute st_idx using 'c3ai', 9007199254740992.0e0, 5;
+execute st_none using 'c3bn', 9007199254740993, 1;
+execute st_idx using 'c3bi', 9007199254740993, 1;
 deallocate prepare st_none;
 deallocate prepare st_idx;
 
