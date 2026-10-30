@@ -18,6 +18,9 @@
  *  join, m merge join, e the same query on the heap) must return the rows of the
  *  reference. Index members print the plan (iscan).
  *  Case 7 prints values the NUMERIC changes of this issue must not change.
+ *  Case 4 keeps the FLOAT comparison of the pre-fix build. PostgreSQL compares
+ *  int, bigint and numeric against real in DOUBLE and answers differently
+ *  (16777217 = 16777216::real is false there).
  *
  *  Coverage:
  *    Case 1:  BIGINT index, equality and ranges near 2^53 and 2^57
